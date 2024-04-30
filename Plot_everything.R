@@ -19,7 +19,7 @@ multiplesheets <- function(fname) {
 
 
 # specifying the path name 
-path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Combined_Post_v2.xlsx"
+path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Combined_Pre_v2.xlsx"
 my_sheets = multiplesheets(path)
 
 Map(assign, names(my_sheets), my_sheets, pos = 1)
@@ -66,8 +66,12 @@ my_sheets = multiplesheets(path)
 
 Map(assign, names(my_sheets), my_sheets, pos = 1)
 
-eL_hours = by_hour_agg(East_Lake_Post_Reno_v2.csv)
+eL_hours = by_hour_agg(East_Lake_Post_Reno.csv)
 albany_hours = by_hour_agg(Albany_Post_Reno_v2.csv)
+conyers_hour = by_hour_agg(Conyers_Post_Reno_v2.csv)
+
+
+
 
 summary(conyers_hour)
 min_date = conyers_hour$Date.Time[1]

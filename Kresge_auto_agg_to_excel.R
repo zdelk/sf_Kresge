@@ -11,7 +11,7 @@ library(statar)
 library(readr)
 library(dplyr)
 # Set the directory containing the files
-folder_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Raw Data NoSmoking"
+folder_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Full Data"
 
 # List all files in the folder with a specific extension (e.g., .csv)
 file_list <- list.files(path = folder_path, pattern = "\\.csv$", full.names = TRUE)
@@ -41,7 +41,7 @@ for (file_name in names(summary_list)) {
 }
 
 # Save the Excel workbook
-excel_file_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Summary_Stats(NS)_4_19.xlsx"
+excel_file_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Summary_Stats_Pre_4_30.xlsx"
 saveWorkbook(wb, excel_file_path, overwrite = TRUE)
 
 # Print a message

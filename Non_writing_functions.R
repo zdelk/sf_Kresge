@@ -62,44 +62,36 @@ combine_variables = function(use_df){
 }
 ##############################
 by_hour_agg = function(use_df) {
-  ###Needs lubridate library##
+  ###Needs lubridate library
+  
+  #Testing
+  use_df$dateConvert = as_datetime(use_df$DateTime)
+  use_df$dateReform = format(use_df$dateConvert, "%m/%d/%Y %H:%M")
+  
   #Converts time to POSIXlt (time) format and Strips the seconds from dateTime variable
-  # Define expected date-time format
-  expected_format <- "%m/%d/%Y %I:%M %p"
-  
-  # Check if DateTime column is already in the expected POSIXt format (mdy_hm)
-  use_df$DateTime <- tryCatch({
-    as.POSIXlt(use_df$DateTime, format = expected_format, tz = Sys.timezone())
-  }, error = function(e) {
-    warning("Date-time parsing failed. Attempting alternative conversion.")
-    parse_date_time(use_df$DateTime, orders = c("mdy_hm", "dmy_hm", "ymd_hm"))
-  })
-  
+  use_df$Date.Time = mdy_hm(use_df$dateReform, tz = Sys.timezone())
   #Further strips minutes from time data
-  use_df$date.hour = trunc(use_df$DateTime, units = "hours")
+  use_df$date.hour = trunc(use_df$Date.Time, units = "hours")
   #converts time back to character without hours and minutes
   use_df$date.hour2 = as.character(use_df$date.hour)
   #Creates a list with the just the unique times
   hour_list = unique(as.character(use_df$date.hour))
   #Creates a list with the values of the IAQ data columns
-  iaq_coloumns = c("Temp", "Hum", "Dioxide", "CO2", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
-  new_coloumns = c("DateTime", "Temp", "Hum", "Dioxide", "CO2", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
+  iaq_coloumns = c("DateTime","Temp","Hum", "Dioxide","CO2", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
   #Creates an empty matrix that is used in the for loop
   hour_means_matrix <- matrix(NA, nrow = length(hour_list), ncol = length(iaq_coloumns))
   #Places time in the first column of the new dataset
-  new_dataframe = data.frame(Date = hour_list)
+  hour_means_matrix[,1] = hour_list
   #Goes through the list of columns and rows and returns the average value of each
   #variables for each hour
-  for (k in 1:length(iaq_coloumns)){
+  for (k in 2:length(iaq_coloumns)){
     name = iaq_coloumns[k]
     for (i in 1:length(hour_list)){
       hour_means_matrix[i,k] = mean(use_df[use_df$date.hour2 == hour_list[i], name])
     }
   }
-  new_dataframe = cbind(new_dataframe, hour_means_matrix)
   #Uses the other list above to rename all the columns in the new dataset
-  colnames(new_dataframe) = new_coloumns
-  new_dataframe$ID = seq.int(nrow(new_dataframe))
+  colnames(hour_means_matrix) = iaq_coloumns
   
-  return(new_dataframe)
+  return(hour_means_matrix)
 }
