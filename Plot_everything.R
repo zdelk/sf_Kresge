@@ -19,7 +19,7 @@ multiplesheets <- function(fname) {
 
 
 # specifying the path name 
-path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Combined_Pre_v2.xlsx"
+path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Pre_Combined_5_1.xlsx"
 my_sheets = multiplesheets(path)
 
 Map(assign, names(my_sheets), my_sheets, pos = 1)
@@ -61,7 +61,7 @@ ggplot(conyers_hour, aes(x = Date.Time, y = Temp)) +
 # Create a sequence of dates at hourly intervals from min_date to max_date
 
 
-path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Combined_Post_v3.xlsx"
+path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Combined_Pre_v2.xlsx"
 my_sheets = multiplesheets(path)
 
 Map(assign, names(my_sheets), my_sheets, pos = 1)
