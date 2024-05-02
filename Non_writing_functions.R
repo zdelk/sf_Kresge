@@ -61,11 +61,39 @@ combine_variables = function(use_df){
   return(new_dataframe)
 }
 ##############################
+#convert_date try two different methods to convert DateTime
+#returns the same data frame with a DateConvert column
+####used with by_hour_agg
+convert_date <- function(df) {
+  # Attempt conversion with as_datetime
+  suppressWarnings({
+    df$dateConvert <- as_datetime(df$DateTime)
+  })
+  
+  # Check if conversion was successful
+  if(all(!is.na(df$dateConvert))) {
+    #print("as_datetime")
+  } else {
+    # Attempt conversion with mdy_hm if as_datetime fails
+    df$dateConvert <- mdy_hm(df$DateTime)
+    
+    # Check if conversion was successful
+    if(all(!is.na(df$dateConvert))) {
+      #print("mdy_hm")
+    } else {
+      # If both conversions fail, print error message
+      cat("Error: Unable to convert date column using any method.")
+    }
+  }
+  
+  return(df)
+}
+#########################
+#Returns a data frame that has a single datapoint for
+#each hour. Needs convert_date first
 by_hour_agg = function(use_df) {
   ###Needs lubridate library
   
-  #Testing
-  use_df$dateConvert = as_datetime(use_df$DateTime)
   use_df$dateReform = format(use_df$dateConvert, "%m/%d/%Y %H:%M")
   
   #Converts time to POSIXlt (time) format and Strips the seconds from dateTime variable
@@ -94,4 +122,11 @@ by_hour_agg = function(use_df) {
   colnames(hour_means_matrix) = iaq_coloumns
   
   return(hour_means_matrix)
+}
+#####################################
+#Does convert_date and by_hour_agg in the correct order
+#needs a better name lol
+do_both <- function(use_df){
+  df <- by_hour_agg(convert_date(use_df))
+  return(df)
 }

@@ -27,7 +27,7 @@ for (file_path in file_list) {
   data <- read.csv(file_path)
   
   # Calculate summary statistics
-  summary_data <- by_hour_agg_pre(combine_variables(data))
+  summary_data <- do_both(combine_variables(data))
   
   # Add the summary to the list
   summary_list[[basename(file_path)]] <- summary_data
@@ -43,7 +43,7 @@ for (file_name in names(summary_list)) {
 }
 
 # Save the Excel workbook
-excel_file_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Pre_By_Hour_Test1.xlsx"
+excel_file_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Pre_do_both_v2.xlsx"
 saveWorkbook(wb, excel_file_path, overwrite = TRUE)
 
 # Print a message
@@ -93,8 +93,8 @@ cat("Summary statistics saved to", excel_file_path, "\n")
 ################################################################
 #Testing function
 folder_handler("C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Full Data", 
-               "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Test_5_1v5.xlsx",
-               by_hour_agg_pre(combine_variables(data)))
+               "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Test_5_2.xlsx",
+               do_both(combine_variables(data)))
 
 albany_pre = by_hour_agg(Albany_pre_reno.csv)
 conyers_test = by
