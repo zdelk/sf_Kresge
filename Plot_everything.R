@@ -67,7 +67,7 @@ my_sheets = multiplesheets(path)
 Map(assign, names(my_sheets), my_sheets, pos = 1)
 
 eL_hours = by_hour_agg(East_Lake_Post_Reno.csv)
-albany_hours = by_hour_agg(Albany_Post_Reno_v2.csv)
+albany_hours = by_hour_agg(Albany_pre_reno.csv)
 conyers_hour = by_hour_agg(Conyers_Post_Reno_v2.csv)
 
 
@@ -79,7 +79,7 @@ max_date = conyers_hour$Date.Time[336]
 time_sequence <- seq(from = min_date, to = max_date, by = "hour")
 
 
-albany_hours$ID = seq.int(nrow(albany_hours))
+albany_hours$ID = seq(nrow(albany_hours))
 
 
 ggplot(albany_hours, aes(x = ID, y = Temp)) +
