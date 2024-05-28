@@ -337,7 +337,7 @@ combine_similar_columns <- function(df_list, similar_columns) {
 
 
 # Call the function to create the new data frame
-path_post <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Post_do_both_v3.xlsx"
+path_post <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Post_do_both_v5.xlsx"
 my_sheets = multiplesheets(path_post)
 similar_columns_post <- c("Temp", "Hum", "Dioxide", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
 
@@ -529,7 +529,7 @@ hcho_subset_long <- pivot_longer(hcho_subset,
                                  values_to = "HCHO")
 
 
-
+library(ggplot2)
 # Set linetype based on the Type column
 ggplot(hcho_subset_long, aes(x = ID, y = HCHO, color = variable)) +
   geom_line(size = 1) +

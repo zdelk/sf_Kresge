@@ -10,7 +10,7 @@ library(statar)
 library(readr)
 library(dplyr)
 # Set the directory containing the files
-folder_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Raw Data"
+folder_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Full Data"
 
 # List all files in the folder with a specific extension (e.g., .csv)
 file_list <- list.files(path = folder_path, pattern = "\\.csv$", full.names = TRUE)
@@ -24,7 +24,7 @@ for (file_path in file_list) {
   data <- read.csv(file_path)
   
   # Calculate summary statistics
-  summary_data <- by_hour_agg(data)
+  summary_data <- su(combine_variables(data))
   
   # Add the summary to the list
   summary_list[[basename(file_path)]] <- summary_data
@@ -40,7 +40,7 @@ for (file_name in names(summary_list)) {
 }
 
 # Save the Excel workbook
-excel_file_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Hour_Post_v1.xlsx"
+excel_file_path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Post_Summary_v1.xlsx"
 saveWorkbook(wb, excel_file_path, overwrite = TRUE)
 
 # Print a message
