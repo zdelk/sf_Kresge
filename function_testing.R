@@ -537,4 +537,40 @@ ggplot(hcho_subset_long, aes(x = ID, y = HCHO, color = variable)) +
   geom_hline(yintercept = 0.1, linetype = "dashed", color = "red") +
   labs(color = "Location") +
   scale_color_manual(values = my_colors) 
+#########################################
+rm_var <- "Temp"
 
+test_subset <- subset(merged_df, select = c("ID", grep(rm_var, names(merged_df), value = TRUE)))
+colClean <- function(x){ colnames(x) <- gsub("\\_PM2.5|_Temp+|_Hum+|_CO2+_|HCHO+|_PM10+|_v2|_Data", 
+                                             "", colnames(x)); x } 
+test_subset <- colClean(test_subset)
+
+
+
+test_names <- names(test_subset[-1])
+
+test_subset_long <- pivot_longer(test_subset, 
+                                 cols = all_of(test_names), 
+                                 names_to = "variable", 
+                                 values_to = "Test_var")
+
+
+my_colors <- c("red", "blue", "green", "black", "purple", "yellow")
+
+# Create a new column indicating whether it's Pre or Post
+test_subset_long$Type <- ifelse(grepl("Prer", test_subset_long$variable), "Pre", "Post")
+test_subset_long$Location <- ifelse(grepl("Albany", test_subset_long$variable),"Albany",
+                                    ifelse(grepl("Conyers", test_subset_long$variable), "Conyers",
+                                           ifelse(grepl("PT", test_subset_long$variable), "PT",
+                                                  ifelse(grepl("Milledgeville", test_subset_long$variable), "Milledgeville",
+                                                         ifelse(grepl("East_Lake", test_subset_long$variable), "East_Lake",
+                                                                ifelse(grepl("Lucy_Morgan", test_subset_long$variable),"Lucy_Morgan","Griffin"))))))
+
+# Set linetype based on the Type column
+ggplot(test_subset_long, aes(x = ID, y = Test_var, color = Location, linetype = Type)) +
+  geom_line(size = 1) +
+  ggtitle("Test_var by Location")+
+  geom_hline(yintercept = 80, linetype = "dashed", color = "red") +
+  labs(color = "Location") +
+  scale_color_manual(values = my_colors) +
+  scale_linetype_manual(values = c("dashed", "solid"))
