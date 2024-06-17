@@ -1,102 +1,62 @@
 library(readr)
 library(readxl)
-
-griffin_data = read.csv("C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Raw Data/Griffin_test_out_raw.csv")
-
-multiplesheets <- function(fname) { 
-  
-  # getting info about all excel sheets 
-  sheets <- readxl::excel_sheets(fname) 
-  tibble <- lapply(sheets, function(x) readxl::read_excel(fname, sheet = x)) 
-  data_frame <- lapply(tibble, as.data.frame) 
-  
-  # assigning names to data frames 
-  names(data_frame) <- sheets 
-  
-  # print data frame 
-  print(data_frame) 
-} 
+#install.packages('tidyr')
+library(tidyr)
+library(ggplot2)
 
 
-# specifying the path name 
-path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Pre_Combined_5_1.xlsx"
-my_sheets = multiplesheets(path)
+path_post <- "~/Kresge/Data/PostReno/Post_do_both_5_31.xlsx"
+my_sheets = multiplesheets(path_post)
+similar_columns_post <- c("Temp", "Hum", "Dioxide", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
+post_reno <- combine_similar_columns(my_sheets, similar_columns_post)
 
-Map(assign, names(my_sheets), my_sheets, pos = 1)
 
-library(lubridate)
+path_pre <- "~/Kresge/Data/PreReno/Prer_do_both_5_31.xlsx"
+my_sheets = multiplesheets(path_pre)
+similar_columns_pre <- c("Temp", "Hum", "CO2", "PM2.5", "PM10")
+pre_reno <- combine_similar_columns(my_sheets, similar_columns_pre)
 
-Albany_Post_Reno_v2.csv$Date.Time = mdy_hm(Albany_Post_Reno_v2.csv$DateTime, tz = Sys.timezone())
-Albany_Post_Reno_v2.csv$hour_test = mdy_h(Albany_Post_Reno_v2.csv$DateTime, tz = Sys.timezone())
 
-for (col in colnames(Albany_Post_Reno_v2.csv[, -c(1)])) {
-  plot(Albany_Post_Reno_v2.csv[[col]], Albany_Post_Reno_v2.csv$DateTime)
+merged_df <- merge(post_reno, pre_reno, by = "ID")
+
+temp_long_subset <- long_subset_maker("Temp",merged_df)
+hum_long_subset <- long_subset_maker("Hum", merged_df)
+co2_long_subset <- long_subset_maker("CO2|Dioxide", merged_df)
+pm2.5_long_subset <- long_subset_maker("PM2.5", merged_df)
+pm10_long_subset <- long_subset_maker("PM10", merged_df)
+
+my_colors <- c("red", "blue", "green", "#FF7F00", "purple", "yellow","#F781BF")
+
+# Set linetype based on the Type column
+comp_plot <- function(long_ss, threshold, var_name){
+  ggplot(long_ss, aes(x = ID, y = Test_var, color = Location, linetype = Type)) +
+    geom_line(size = 1) +
+    ylab(var_name)+
+    geom_hline(yintercept = threshold, linetype = "dashed", color = "black") +
+    labs(color = "Location") +
+    # theme(legend.text=element_text(size=rel(1.5)), legend.position = 'inside', 
+    #       legend.position.inside = leg_pos)+
+    scale_color_manual(values = my_colors) +
+    scale_linetype_manual(values = c("solid", "dashed"))+
+    scale_x_continuous(name = NULL, limits = c(0,336), expand = c(0,0) ,breaks = seq(0, 336, by = 24), 
+                       labels = paste0("Day ", c(0:14)), minor_breaks = seq(0, 336, by = 12))+
+    theme_minimal(base_size = 20)
 }
 
-#Test Stuff##################
-library(ggplot2)
-plot(Albany_Post_Reno_v2.csv$Date.Time, Albany_Post_Reno_v2.csv$Temp)
-
-ggplot(Albany_Post_Reno_v2.csv, aes(x = Date.Time, y = PM2.5)) +
-  geom_line()
-
-summary(Albany_Post_Reno_v2.csv)
-
-conyers_hour = by_hour_agg(Conyers_Post_Reno_v2.csv)
-summary(conyers_hour)
-
-plot(conyers_hour$DateTime, conyers_hour$Temp)
-
-conyers_hour$Date.Time = mdy_h(conyers_hour$DateTime, tz = Sys.timezone(), format = ("%Y-%m-%d %H:%M"))
-conyers_hour$Date.Time = as.POSIXct(conyers_hour$DateTime, tz = "", format = ("%Y-%m-%d %H:%M"))
-summary(conyers_hour)
-conyers_hour$DateTest = as.Date(conyers_hour$DateTime, format = ("%Y-%m-%d %H:%M"))
-
-plot(conyers_hour$Date.Time, conyers_hour$Temp)
+comp_plot(temp_long_subset, 74, "Temperature (\u00B0F)")
+comp_plot(hum_long_subset, 70, "Humidity (%)")
+comp_plot(co2_long_subset, 2001, "Carbon Dioxide (ppm)")
+comp_plot(pm2.5_long_subset, 55.5, expression("PM2.5 (" * mu * "g/m"^3 * ")"))
+comp_plot(pm10_long_subset, 205, expression("PM10 (" * mu * "g/m"^3 * ")"))
 
 
-ggplot(conyers_hour, aes(x = Date.Time, y = Temp)) +
-  geom_line()
-#################################################################
-# Create a sequence of dates at hourly intervals from min_date to max_date
+hcho_long_subset <- long_subset_maker("HCHO", merged_df)
+comp_plot(hcho_long_subset, 0.1, expression("Formalydhyde (mg/m"^3 * ")"))
 
 
-path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PreReno/Combined_Pre_v2.xlsx"
-my_sheets = multiplesheets(path)
-
-Map(assign, names(my_sheets), my_sheets, pos = 1)
-
-eL_hours = by_hour_agg(East_Lake_Post_Reno.csv)
-albany_hours = by_hour_agg(Albany_pre_reno.csv)
-conyers_hour = by_hour_agg(Conyers_Post_Reno_v2.csv)
+co_long_subset <- long_subset_maker("Monoxide", merged_df)
+comp_plot(co_long_subset, 0.9, "Carbon Monoxide (ppm)")
 
 
-
-
-summary(conyers_hour)
-min_date = conyers_hour$Date.Time[1]
-max_date = conyers_hour$Date.Time[336]
-time_sequence <- seq(from = min_date, to = max_date, by = "hour")
-
-
-albany_hours$ID = seq(nrow(albany_hours))
-
-
-ggplot(albany_hours, aes(x = ID, y = Temp)) +
-  geom_line()
-
-df_list = list(eL_hours, albany_hours)
-
-all_id = unique(unlist(lapply(df_list, function(df) c (df$ID))))
-min_id = min(all_id)
-max_id = max(all_id)
-
-temp_data_hour <- data.frame(ID = all_id)
-temp_data_hour$Albany_Post = albany_hours$Temp
-temp_data_hour$EL_Post = eL_hours$Temp
-temp_data_hour$ID = seq.int(nrow(temp_data_hour))
-
-total = merge(albany_hours, eL_hours, by = "ID")
-
-file_list
-by_hour_agg(Peachtree_Post_Reno.csv)
+voc_long_subset <- long_subset_maker("Organic", merged_df)
+comp_plot(voc_long_subset, 2001, "Volatile Organic Compounds (ppb)")

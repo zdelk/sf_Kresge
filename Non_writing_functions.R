@@ -115,7 +115,7 @@ by_hour_agg = function(use_df) {
   for (k in 2:length(iaq_coloumns)){
     name = iaq_coloumns[k]
     for (i in 1:length(hour_list)){
-      hour_means_matrix[i,k] = mean(use_df[use_df$date.hour2 == hour_list[i], name])
+      hour_means_matrix[i,k] = mean(use_df[use_df$date.hour2 == hour_list[i], name], na.rm = TRUE)
     }
   }
   #Uses the other list above to rename all the columns in the new dataset
@@ -130,3 +130,96 @@ do_both <- function(use_df){
   df <- by_hour_agg(convert_date(use_df))
   return(df)
 }
+#######################################
+#Takes in the output from mutiplesheets()
+#subsets evertying to 337 observations that begin at the same time
+#Cobines all variables to one dataset
+combine_similar_columns <- function(df_list, similar_columns) {
+  for(i in 1:length(df_list)){
+    use_df <- df_list[[i]]
+    use_df$hour <- format(as_datetime(use_df$DateTime), format = "%H")
+    start_num <- as.numeric(match("12",use_df$hour))
+    end_num <- start_num + 335
+    
+    use_df <- use_df[start_num:end_num,]
+    use_df$ID <- seq.int(nrow(use_df))
+    df_list[[i]] <- use_df
+    df_list[[i]][2:10] <- sapply(df_list[[i]][2:10], as.numeric)
+  }
+  # Initialize an empty data frame to store combined columns
+  combined_df <- data.frame(matrix(NA, nrow = 336, ncol = 1))
+  combined_df[1] <- seq.int(nrow(combined_df))
+  
+  namelist = names(df_list)
+  namelist_clean <- gsub("\\.csv$", "", namelist)
+  
+  # Iterate over each similar column
+  for (col in similar_columns) {
+    # Initialize a list to store column data from each data frame
+    column_data <- list()
+    
+    # Iterate over each data frame in the list
+    for (i in seq_along(df_list)) {
+      # Check if the column exists in the current data frame
+      if (col %in% names(df_list[[i]])) {
+        # If the column exists, add it to the column data list
+        column_data[[i]] <- df_list[[i]][[col]]
+      } else {
+        # If the column doesn't exist, add NA values to maintain alignment
+        column_data[[i]] <- rep(NA, nrow(df_list[[i]]))
+      }
+    }
+    
+    # Combine the columns using cbind
+    combined_column <- do.call(cbind, column_data)
+    
+    # Set column names for the combined column
+    
+    colnames(combined_column) <- paste0(namelist_clean, "_", col)
+    
+    
+    # Add the combined column to the combined data frame
+    combined_df <- cbind(combined_df, combined_column)
+    colnames(combined_df)[1] <- "ID"
+  }
+  
+  return(combined_df)
+}
+# 
+# Example of use:
+# path_post <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Post_do_both_v5.xlsx"
+# my_sheets = multiplesheets(path_post)
+# similar_columns_post <- c("Temp", "Hum", "Dioxide", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
+# 
+# post_reno <- combine_similar_columns(my_sheets, similar_columns_post)
+#################################################################################
+
+colClean <- function(x){ colnames(x) <- gsub("\\_PM2.5|_Temp+|_Hum+|_CO2+_|HCHO+|_PM10+|_v2|_Data", 
+                                             "", colnames(x)); x } 
+#------------------------------------------------------------------------------#
+
+long_subset_maker <- function(test_var,df){
+  
+  test_subset <- subset(merged_df, select = c("ID", grep(test_var, names(df), value = TRUE)))
+  
+  test_subset <- colClean(test_subset)
+  
+  test_names <- names(test_subset[-1])
+  
+  test_subset_long <- pivot_longer(test_subset, 
+                                   cols = all_of(test_names), 
+                                   names_to = "variable", 
+                                   values_to = "Test_var")
+  
+  # Create a new column indicating whether it's Pre or Post
+  test_subset_long$Type <- ifelse(grepl("Prer", test_subset_long$variable), "Pre", "Post")
+  test_subset_long$Location <- ifelse(grepl("Albany", test_subset_long$variable),"Albany",
+                                      ifelse(grepl("Conyers", test_subset_long$variable), "Conyers",
+                                             ifelse(grepl("Peachtree_Tower", test_subset_long$variable), "Peachtee_Tower",
+                                                    ifelse(grepl("Milledgeville", test_subset_long$variable), "Milledgeville",
+                                                           ifelse(grepl("East_Lake", test_subset_long$variable), "East_Lake",
+                                                                  ifelse(grepl("Lucy_Morgan",
+                                                                               test_subset_long$variable),"Lucy_Morgan","Griffin"))))))
+  return(test_subset_long)
+}
+#-------------------------------------------------------------------------------#

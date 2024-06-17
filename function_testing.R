@@ -136,115 +136,115 @@ convert_date <- function(df) {
 }
 
 #Test convert_date in by_hour_agg
+# 
+# by_hour_agg_test = function(use_df) {
+#   ###Needs lubridate library
+#   
+#   #Testing
+#   suppressWarnings({
+#     use_df$dateConvert <- as_datetime(use_df$DateTime)
+#   })
+#   
+#   
+#   # Check if conversion was successful
+#   if(all(!is.na(use_df$dateConvert))) {
+#     #print("as_datetime")
+#   } else {
+#     # Attempt conversion with mdy_hm if as_datetime fails
+#     use_df$dateConvert <- mdy_hm(use_df$DateTime)
+#     
+#     # Check if conversion was successful
+#     if(all(!is.na(use_df$dateConvert))) {
+#       #print("mdy_hm")
+#     } else {
+#       # If both conversions fail, print error message
+#       cat("Error: Unable to convert date column using any method.")
+#     }
+#   }
+#   
+#   use_df$dateReform = format(use_df$dateConvert, "%m/%d/%Y %H:%M")
+#   
+#   #Converts time to POSIXlt (time) format and Strips the seconds from dateTime variable
+#   use_df$Date.Time = mdy_hm(use_df$dateReform, tz = Sys.timezone())
+#   #Further strips minutes from time data
+#   use_df$date.hour = trunc(use_df$Date.Time, units = "hours")
+#   #converts time back to character without hours and minutes
+#   use_df$date.hour2 = as.character(use_df$date.hour)
+#   #Creates a list with the just the unique times
+#   hour_list = unique(as.character(use_df$date.hour))
+#   #Creates a list with the values of the IAQ data columns
+#   iaq_coloumns = c("DateTime","Temp","Hum", "Dioxide","CO2", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
+#   #Creates an empty matrix that is used in the for loop
+#   hour_means_matrix <- matrix(NA, nrow = length(hour_list), ncol = length(iaq_coloumns))
+#   #Places time in the first column of the new dataset
+#   hour_means_matrix[,1] = hour_list
+#   #Goes through the list of columns and rows and returns the average value of each
+#   #variables for each hour
+#   for (k in 2:length(iaq_coloumns)){
+#     name = iaq_coloumns[k]
+#     for (i in 1:length(hour_list)){
+#       hour_means_matrix[i,k] = mean(use_df[use_df$date.hour2 == hour_list[i], name])
+#     }
+#   }
+#   #Uses the other list above to rename all the columns in the new dataset
+#   colnames(hour_means_matrix) = iaq_coloumns
+#   
+#   return(hour_means_matrix)
+# }
+# 
+# albany_hour_test <- by_hour_agg(Albany_Post_Reno_v2.csv)
+# albany_date_test <- convert_date(Albany_Post_Reno_v2.csv)
 
-by_hour_agg_test = function(use_df) {
-  ###Needs lubridate library
-  
-  #Testing
-  suppressWarnings({
-    use_df$dateConvert <- as_datetime(use_df$DateTime)
-  })
-  
-  
-  # Check if conversion was successful
-  if(all(!is.na(use_df$dateConvert))) {
-    #print("as_datetime")
-  } else {
-    # Attempt conversion with mdy_hm if as_datetime fails
-    use_df$dateConvert <- mdy_hm(use_df$DateTime)
-    
-    # Check if conversion was successful
-    if(all(!is.na(use_df$dateConvert))) {
-      #print("mdy_hm")
-    } else {
-      # If both conversions fail, print error message
-      cat("Error: Unable to convert date column using any method.")
-    }
-  }
-  
-  use_df$dateReform = format(use_df$dateConvert, "%m/%d/%Y %H:%M")
-  
-  #Converts time to POSIXlt (time) format and Strips the seconds from dateTime variable
-  use_df$Date.Time = mdy_hm(use_df$dateReform, tz = Sys.timezone())
-  #Further strips minutes from time data
-  use_df$date.hour = trunc(use_df$Date.Time, units = "hours")
-  #converts time back to character without hours and minutes
-  use_df$date.hour2 = as.character(use_df$date.hour)
-  #Creates a list with the just the unique times
-  hour_list = unique(as.character(use_df$date.hour))
-  #Creates a list with the values of the IAQ data columns
-  iaq_coloumns = c("DateTime","Temp","Hum", "Dioxide","CO2", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
-  #Creates an empty matrix that is used in the for loop
-  hour_means_matrix <- matrix(NA, nrow = length(hour_list), ncol = length(iaq_coloumns))
-  #Places time in the first column of the new dataset
-  hour_means_matrix[,1] = hour_list
-  #Goes through the list of columns and rows and returns the average value of each
-  #variables for each hour
-  for (k in 2:length(iaq_coloumns)){
-    name = iaq_coloumns[k]
-    for (i in 1:length(hour_list)){
-      hour_means_matrix[i,k] = mean(use_df[use_df$date.hour2 == hour_list[i], name])
-    }
-  }
-  #Uses the other list above to rename all the columns in the new dataset
-  colnames(hour_means_matrix) = iaq_coloumns
-  
-  return(hour_means_matrix)
-}
-
-albany_hour_test <- by_hour_agg(Albany_Post_Reno_v2.csv)
-albany_date_test <- convert_date(Albany_Post_Reno_v2.csv)
-
-#############################################################################
-use_df <- Milledgeville_Post_Reno.csv
-
-by_hour_agg_test = function(use_df) {
-  ###Needs lubridate library
-  
-  use_df$dateReform = format(use_df$dateConvert, "%m/%d/%Y %H:%M")
-  
-  #Converts time to POSIXlt (time) format and Strips the seconds from dateTime variable
-  use_df$Date.Time = mdy_hm(use_df$dateReform, tz = Sys.timezone())
-  #Further strips minutes from time data
-  use_df$date.hour = trunc(use_df$Date.Time, units = "hours")
-  #converts time back to character without hours and minutes
-  use_df$date.hour2 = as.character(use_df$date.hour)
-  #Creates a list with the just the unique times
-  hour_list = unique(as.character(use_df$date.hour))
-  #Creates a list with the values of the IAQ data columns
-  iaq_coloumns = c("DateTime","Temp","Hum", "Dioxide","CO2", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
-  #Creates an empty matrix that is used in the for loop
-  hour_means_matrix <- matrix(NA, nrow = length(hour_list), ncol = length(iaq_coloumns))
-  #Places time in the first column of the new dataset
-  hour_means_matrix[,1] = hour_list
-  #Goes through the list of columns and rows and returns the average value of each
-  #variables for each hour
-  for (k in 2:length(iaq_coloumns)){
-    name = iaq_coloumns[k]
-    for (i in 1:length(hour_list)){
-      hour_means_matrix[i,k] = mean(use_df[use_df$date.hour2 == hour_list[i], name])
-    }
-  }
-  #Uses the other list above to rename all the columns in the new dataset
-  colnames(hour_means_matrix) = iaq_coloumns
-  
-  return(hour_means_matrix)
-}
-
-do_both <- function(use_df){
-  df <- by_hour_agg_test(convert_date(use_df))
-  return(df)
-}
-
-test_both2 <- by_hour_agg_test(convert_date(Albany_Post_Reno_v2.csv))
-test_both3 <- do_both(Albany_Post_Reno_v2.csv)
-test_both4 <- do_both(Albany_pre_reno.csv)
-test_both6 <- do_both(Conyers_Full_Data.csv)
-
-ncol(Conyers_Full_Data.csv)
-
-colnames(Conyers_Full_Data.csv)
-test_list <- colnames(Conyers_Full_Data.csv)
+# #############################################################################
+# use_df <- Milledgeville_Post_Reno.csv
+# 
+# by_hour_agg_test = function(use_df) {
+#   ###Needs lubridate library
+#   
+#   use_df$dateReform = format(use_df$dateConvert, "%m/%d/%Y %H:%M")
+#   
+#   #Converts time to POSIXlt (time) format and Strips the seconds from dateTime variable
+#   use_df$Date.Time = mdy_hm(use_df$dateReform, tz = Sys.timezone())
+#   #Further strips minutes from time data
+#   use_df$date.hour = trunc(use_df$Date.Time, units = "hours")
+#   #converts time back to character without hours and minutes
+#   use_df$date.hour2 = as.character(use_df$date.hour)
+#   #Creates a list with the just the unique times
+#   hour_list = unique(as.character(use_df$date.hour))
+#   #Creates a list with the values of the IAQ data columns
+#   iaq_coloumns = c("DateTime","Temp","Hum", "Dioxide","CO2", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
+#   #Creates an empty matrix that is used in the for loop
+#   hour_means_matrix <- matrix(NA, nrow = length(hour_list), ncol = length(iaq_coloumns))
+#   #Places time in the first column of the new dataset
+#   hour_means_matrix[,1] = hour_list
+#   #Goes through the list of columns and rows and returns the average value of each
+#   #variables for each hour
+#   for (k in 2:length(iaq_coloumns)){
+#     name = iaq_coloumns[k]
+#     for (i in 1:length(hour_list)){
+#       hour_means_matrix[i,k] = mean(use_df[use_df$date.hour2 == hour_list[i], name])
+#     }
+#   }
+#   #Uses the other list above to rename all the columns in the new dataset
+#   colnames(hour_means_matrix) = iaq_coloumns
+#   
+#   return(hour_means_matrix)
+# }
+# 
+# do_both <- function(use_df){
+#   df <- by_hour_agg_test(convert_date(use_df))
+#   return(df)
+# }
+# 
+# test_both2 <- by_hour_agg_test(convert_date(Albany_Post_Reno_v2.csv))
+# test_both3 <- do_both(Albany_Post_Reno_v2.csv)
+# test_both4 <- do_both(Albany_pre_reno.csv)
+# test_both6 <- do_both(Conyers_Full_Data.csv)
+# 
+# ncol(Conyers_Full_Data.csv)
+# 
+# colnames(Conyers_Full_Data.csv)
+# test_list <- colnames(Conyers_Full_Data.csv)
 ####################################################################
 #Testing subset to 2 weeks
 
@@ -334,52 +334,72 @@ combine_similar_columns <- function(df_list, similar_columns) {
   return(combined_df)
 }
 
-
+###########################################################################
+#Testing - works?
+combine_similar_columns <- function(df_list, similar_columns) {
+  for(i in 1:length(df_list)){
+    use_df <- df_list[[i]]
+    use_df$hour <- format(as_datetime(use_df$DateTime), format = "%H")
+    start_num <- as.numeric(match("12",use_df$hour))
+    end_num <- start_num + 336
+    
+    use_df <- use_df[start_num:end_num,]
+    use_df$ID <- seq.int(nrow(use_df))
+    df_list[[i]] <- use_df
+    df_list[[i]][2:10] <- sapply(df_list[[i]][2:10], as.numeric)
+  }
+  # Initialize an empty data frame to store combined columns
+  combined_df <- data.frame(matrix(NA, nrow = 337, ncol = 1))
+  combined_df[1] <- seq.int(nrow(combined_df))
+  
+  namelist = names(df_list)
+  namelist_clean <- gsub("\\.csv$", "", namelist)
+  
+  # Iterate over each similar column
+  for (col in similar_columns) {
+    # Initialize a list to store column data from each data frame
+    column_data <- list()
+    
+    # Iterate over each data frame in the list
+    for (i in seq_along(df_list)) {
+      # Check if the column exists in the current data frame
+      if (col %in% names(df_list[[i]])) {
+        # If the column exists, add it to the column data list
+        column_data[[i]] <- df_list[[i]][[col]]
+      } else {
+        # If the column doesn't exist, add NA values to maintain alignment
+        column_data[[i]] <- rep(NA, nrow(df_list[[i]]))
+      }
+    }
+    
+    # Combine the columns using cbind
+    combined_column <- do.call(cbind, column_data)
+    
+    # Set column names for the combined column
+    
+    colnames(combined_column) <- paste0(namelist_clean, "_", col)
+    
+    
+    # Add the combined column to the combined data frame
+    combined_df <- cbind(combined_df, combined_column)
+  }
+  
+  return(combined_df)
+}
+###########################################################################
 
 # Call the function to create the new data frame
 path_post <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Post_do_both_v5.xlsx"
 my_sheets = multiplesheets(path_post)
 similar_columns_post <- c("Temp", "Hum", "Dioxide", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
-
-for(i in 1:length(my_sheets)){
-  use_df <- my_sheets[[i]]
-  use_df$hour <- format(as_datetime(use_df$DateTime), format = "%H")
-  start_num <- as.numeric(match("12",use_df$hour))
-  end_num <- start_num + 336
-  
-  use_df <- use_df[start_num:end_num,]
-  use_df$ID <- seq.int(nrow(use_df))
-  my_sheets[[i]] <- use_df
-  my_sheets[[i]][2:10] <- sapply(my_sheets[[i]][2:10], as.numeric)
-}
-
 post_reno <- combine_similar_columns(my_sheets, similar_columns_post)
-colnames(post_reno)[1] <- "ID"
-
-
 
 
 path_pre <- "~/Kresge/Data/PreReno/Prer_do_both_v3.xlsx"
 my_sheets = multiplesheets(path_pre)
 similar_columns_pre <- c("Temp", "Hum", "CO2", "PM2.5", "PM10")
-
-
-
-for(i in 1:length(my_sheets)){
-  use_df <- my_sheets[[i]]
-  use_df$hour <- format(as_datetime(use_df$DateTime), format = "%H")
-  start_num <- as.numeric(match("12",use_df$hour))
-  end_num <- start_num + 336
-  
-  use_df <- use_df[start_num:end_num,]
-  use_df$ID <- seq.int(nrow(use_df))
-  my_sheets[[i]] <- use_df
-  my_sheets[[i]][2:10] <- sapply(my_sheets[[i]][2:10], as.numeric)
-}
-
-
 pre_reno <- combine_similar_columns(my_sheets, similar_columns_pre)
-colnames(pre_reno)[1] <- "ID"
+
 
 merged_df <- merge(post_reno, pre_reno, by = "ID")
 
@@ -389,8 +409,8 @@ namelist = names(my_sheets)
 namelist_clean <- gsub("\\.csv$", "", namelist)
 full_list = c("ID", namelist_clean)
 
-library(ggplot2)
-library(tidyr)
+#################################################
+#Everything below can be automatize
 #################################################
 #Temp
 temp_subset <- subset(merged_df, select = c("ID", grep("Temp", names(merged_df), value = TRUE)))
@@ -411,6 +431,15 @@ ggplot(temp_subset_long, aes(x = ID, y = temperature, color = variable)) +
   geom_hline(yintercept = 80, linetype = "dashed", color = "red") +
   labs(color = "Location")
 
+
+#################################################################
+ggplot(temp_long_subset, aes(x = ID, y = Test_var, color = Location, linetype = Type)) +
+  geom_line(size = 1) +
+  ggtitle("Test_var by Location")+
+  geom_hline(yintercept = 80, linetype = "dashed", color = "red") +
+  labs(color = "Location") +
+  scale_color_manual(values = my_colors) +
+  scale_linetype_manual(values = c("dashed", "solid"))
 
 #############################################################################
 #Humidity
@@ -545,8 +574,6 @@ colClean <- function(x){ colnames(x) <- gsub("\\_PM2.5|_Temp+|_Hum+|_CO2+_|HCHO+
                                              "", colnames(x)); x } 
 test_subset <- colClean(test_subset)
 
-
-
 test_names <- names(test_subset[-1])
 
 test_subset_long <- pivot_longer(test_subset, 
@@ -574,3 +601,77 @@ ggplot(test_subset_long, aes(x = ID, y = Test_var, color = Location, linetype = 
   labs(color = "Location") +
   scale_color_manual(values = my_colors) +
   scale_linetype_manual(values = c("dashed", "solid"))
+##############################################################################################
+
+path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Post_do_both_5_31.xlsx"
+my_sheets = multiplesheets(path)
+Map(assign, names(my_sheets), my_sheets, pos = 1)
+
+
+lm_full <- read.csv("~/Kresge/Data/PostReno/RawDataNoSmoking/Post_Lucy_Morgan.csv")
+
+lm_merged <- combine_variables(lm_full)
+lm_do_both <- do_both(lm_merged)
+lm_date <- convert_date(lm_merged)
+lm_by_hour <- by_hour_agg(lm_date)
+summary(lm_full)
+summary(lm_merged)
+summary(lm_do_both)
+
+lm_do_both[2:10] <- sapply(lm_do_both[2:10], as.numeric)
+write.csv(lm_merged, "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/lm_merged.csv", row.names = FALSE)
+
+use_df <- lm_date
+use_df[2:10][use_df[2:10] == "NaN"] <- NA
+summary(use_df)
+summary(lm_date)
+
+use_df$dateReform = format(use_df$dateConvert, "%m/%d/%Y %H:%M")
+
+#Converts time to POSIXlt (time) format and Strips the seconds from dateTime variable
+use_df$Date.Time = mdy_hm(use_df$dateReform, tz = Sys.timezone())
+#Further strips minutes from time data
+use_df$date.hour = trunc(use_df$Date.Time, units = "hours")
+#converts time back to character without hours and minutes
+use_df$date.hour2 = as.character(use_df$date.hour)
+#Creates a list with the just the unique times
+hour_list = unique(as.character(use_df$date.hour))
+#Creates a list with the values of the IAQ data columns
+iaq_coloumns = c("DateTime","Temp","Hum", "Dioxide","CO2", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
+#Creates an empty matrix that is used in the for loop
+hour_means_matrix <- matrix(NA, nrow = length(hour_list), ncol = length(iaq_coloumns))
+#Places time in the first column of the new dataset
+hour_means_matrix[,1] = hour_list
+#Goes through the list of columns and rows and returns the average value of each
+#variables for each hour
+for (k in 2:length(iaq_coloumns)){
+  name = iaq_coloumns[k]
+  for (i in 1:length(hour_list)){
+    hour_means_matrix[i,k] = mean(use_df[use_df$date.hour2 == hour_list[i], name], na.rm = TRUE)
+  }
+}
+#Uses the other list above to rename all the columns in the new dataset
+colnames(hour_means_matrix) = iaq_coloumns
+
+mean(use_df[use_df$date.hour2 == hour_list[1250], "Temp"], na.rm = TRUE)
+
+mean(use_df[use_df$date.hour2 == hour_list[1250], "Temp"])
+##################################################################################################
+#plot testing
+library(ggplot2)
+comp_plot(temp_long_subset, 74, "Temperature")
+
+
+ggplot(temp_long_subset, aes(x = ID, y = Test_var, color = Location, linetype = Type)) +
+  geom_line(size = 1) +
+  ylab("Temperature (\u00B0F)")+
+  #ylim(0,2) +
+  geom_hline(yintercept = 78, linetype = "dashed", color = "black") +
+  labs(color = "Location") +
+  # theme(legend.text=element_text(size=rel(1.5)), legend.position = 'inside', 
+  #       legend.position.inside = c(0.12, 0.75))+
+  scale_color_manual(values = my_colors) +
+  scale_linetype_manual(values = c("solid", "dashed")) +
+  scale_x_continuous(name = NULL, limits = c(0,336), expand = c(0,0) ,breaks = seq(0, 336, by = 24), 
+                     labels = paste0("Day ", c(0:14)), minor_breaks = seq(0, 336, by = 12))+
+  theme_minimal(base_size = 20)
