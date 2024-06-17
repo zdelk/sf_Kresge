@@ -1,15 +1,48 @@
 Zachary Delk for Southface
 Proj: Kresage IAQ Data Analysis
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#------------------------------------------------------------------------------#
 This file is an accompaniment to multiple R code files, all related to Kresage IAQ data analysis. 
 It will show my thought process and explain my reasoning for certain choices.
 R code path: TBD
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#------------------------------------------------------------------------------#
 !03.28.23
 I made this file a while back, however it was messy and did not tell the whole story so I will make
 an attempt to clean it up. I will section off each section by the correlated file name. I will do by best
 to orginize the whole file as a step by step guide to the process I have started. This may change.
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#------------------------------------------------------------------------------#
+#---------------------------Non_writing_functions.R----------------------------#
+Reason for file:
+Contains the function that I wrote for this project. Some are basic fucntions that
+load mulitplesheets of an excel to seperate dataframes. Others are a little more complicated
+
+The code is commeted pretty well so it should explain itself.
+#------------------------------------------------------------------------------#
+#---------------------------Plot_everything.R----------------------------------#
+Reason for file:
+This is the finishing file. Once I had a set theme for the ggplot I turned it into
+a function to be used for the write-up. This script also contain the loading in process
+and the creating of long subsets for each of the variables
+#------------------------------------------------------------------------------#
+#---------------------------fuction_testing.R----------------------------------#
+Reason for file:
+This file is a testing ground for the project. Its where I started back in the day.
+It is where the fucntion in Non_writing fuctions were created. Multiple versions
+of the function are present. There is also alot of random code where I tried different 
+things either just to see if it worked or just going down a different path for the
+analysis project. The comments are lacking.
+#------------------------------------------------------------------------------#
+#----------------------------Kresge_auto_agg_to_excel.R------------------------#
+Reason for file:
+This script uses either basic funcitons like summary() or sum_up() or functions
+I created. It takes a file path to .csv file and runs them through the function.
+Then it outputs to a excel file where each file gets its own sheet. I use it with
+the do_both(combine_variables()) to get the nice datasets that are hour aggregates
+with all the like columns combined for each location. Just have to make sure to update
+the input folder path and output file name when using it
+#------------------------------------------------------------------------------#
+#----------------------------ARCHIVE-------------------------------------------#
+#------------------------------------------------------------------------------#
+
 !Removes_seconds.R
 Reason for file: 
 	The individual sensor data files come with 2 variables: sensor data and timestamp
@@ -31,7 +64,7 @@ Extra:
 	read_csv sometimes it likes read.csv. Have not figured out a work around as of yet.
 	Also depending on how you can edit data as you pull it from the sensor site, this code
 	might be pointless. But until then it is usefull
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#------------------------------------------------------------------------------#
 !Removes_empty_columns.R
 Reason for file:
 	While this is not extremly common, there have been instances where we will have completly empty columns in the 
@@ -48,13 +81,13 @@ File Process:
 Extra:
 	It seems like I shouldn't need this code. I feel like there is a way to specify this when you intially pull data
 	from the sensor site.
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#------------------------------------------------------------------------------#
 !test_site.R 
 Reason for file:
 	This is a code file I have been using as a test site before moving it to the main branch which I will talk about
 	next. It will not be commented as much the main branch. I reserve the right to use it a scratch work before setting
 	anything in stone on main.
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#------------------------------------------------------------------------------#
 !Cleaning_analysis.R 
 Reason for file:
 	This is where the actual data analysis happens. The thought process is once data has been aggregated and had the 
@@ -94,7 +127,7 @@ Libraries:
 		
 	openair - New to me. used for air currents. But can also do very good time averages and you can specify the interval
 		
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#------------------------------------------------------------------------------#
 !Stuff I had before and don't want to remove from this file:
 	
 Step-by-Step Data Cleaning for IAQ Data
