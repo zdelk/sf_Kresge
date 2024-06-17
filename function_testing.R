@@ -1,4 +1,4 @@
-#funciton testing
+#function testing -----------Testing ground (not maintained)
 
 #Zacahry Delk######################
 library(readr)

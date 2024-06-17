@@ -1,12 +1,16 @@
 #Zachary Delk
 #Southface
+#Kresge
 #All Created Functions
+#------------------------------------------------------------------------------#
+#loading used libraries
 library(readr)
 library(readxl)
 library(lubridate)
 library(dplyr)
 library(openxlsx)
 library(statar)
+#------------------------------------------------------------------------------#
 #Reads all sheets in an excel file
 multiplesheets <- function(fname) { 
   
@@ -21,7 +25,6 @@ multiplesheets <- function(fname) {
   # print data frame 
   print(data_frame) 
 } 
-
 #Format to use Above
 # 
 # path <- "C:/Users/zdelk/OneDrive - Southface/Documents/Kresge/Data/PostReno/Combined_Post_v2.xlsx"
@@ -29,7 +32,7 @@ multiplesheets <- function(fname) {
 # 
 # Map(assign, names(my_sheets), my_sheets, pos = 1)
 
-##############################
+#------------------------------------------------------------------------------#
 #Creates a function that averages data across like columns
 #Then returns a new data set
 combine_variables = function(use_df){
@@ -60,7 +63,7 @@ combine_variables = function(use_df){
   
   return(new_dataframe)
 }
-##############################
+#------------------------------------------------------------------------------#
 #convert_date try two different methods to convert DateTime
 #returns the same data frame with a DateConvert column
 ####used with by_hour_agg
@@ -88,12 +91,13 @@ convert_date <- function(df) {
   
   return(df)
 }
-#########################
+#------------------------------------------------------------------------------#
+
 #Returns a data frame that has a single datapoint for
 #each hour. Needs convert_date first
 by_hour_agg = function(use_df) {
   ###Needs lubridate library
-  
+  #Converts dates to standard format
   use_df$dateReform = format(use_df$dateConvert, "%m/%d/%Y %H:%M")
   
   #Converts time to POSIXlt (time) format and Strips the seconds from dateTime variable
@@ -123,27 +127,34 @@ by_hour_agg = function(use_df) {
   
   return(hour_means_matrix)
 }
-#####################################
+#------------------------------------------------------------------------------#
 #Does convert_date and by_hour_agg in the correct order
 #needs a better name lol
 do_both <- function(use_df){
   df <- by_hour_agg(convert_date(use_df))
   return(df)
 }
-#######################################
+#------------------------------------------------------------------------------#
 #Takes in the output from mutiplesheets()
-#subsets evertying to 337 observations that begin at the same time
-#Cobines all variables to one dataset
+#subsets everything to 337 observations that begin at the same time
+#Combines all variables to one dataset
 combine_similar_columns <- function(df_list, similar_columns) {
   for(i in 1:length(df_list)){
     use_df <- df_list[[i]]
+    #Creates new variable with the hour
     use_df$hour <- format(as_datetime(use_df$DateTime), format = "%H")
+    #Get the id where noon first occurs in the data frame
     start_num <- as.numeric(match("12",use_df$hour))
+    #Gets the end number so the dataset is 336 points
     end_num <- start_num + 335
     
+    #Subsets the data set using those points
     use_df <- use_df[start_num:end_num,]
+    #Add ID column
     use_df$ID <- seq.int(nrow(use_df))
+    #Puts the dataframe into the list
     df_list[[i]] <- use_df
+    #converts the columns to numberic vars. Most are in char
     df_list[[i]][2:10] <- sapply(df_list[[i]][2:10], as.numeric)
   }
   # Initialize an empty data frame to store combined columns
@@ -151,6 +162,7 @@ combine_similar_columns <- function(df_list, similar_columns) {
   combined_df[1] <- seq.int(nrow(combined_df))
   
   namelist = names(df_list)
+  #Cleans up the names
   namelist_clean <- gsub("\\.csv$", "", namelist)
   
   # Iterate over each similar column
@@ -192,20 +204,22 @@ combine_similar_columns <- function(df_list, similar_columns) {
 # similar_columns_post <- c("Temp", "Hum", "Dioxide", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
 # 
 # post_reno <- combine_similar_columns(my_sheets, similar_columns_post)
-#################################################################################
+#------------------------------------------------------------------------------#
 
+#Cleans up the varaible names used in the longsubset maker
 colClean <- function(x){ colnames(x) <- gsub("\\_PM2.5|_Temp+|_Hum+|_CO2+_|HCHO+|_PM10+|_v2|_Data", 
                                              "", colnames(x)); x } 
 #------------------------------------------------------------------------------#
 
 long_subset_maker <- function(test_var,df){
-  
+  #Subsets the merged_df to only the Variable you want
   test_subset <- subset(merged_df, select = c("ID", grep(test_var, names(df), value = TRUE)))
-  
+  #Cleans the extra stuff on the names
   test_subset <- colClean(test_subset)
-  
+  #retruns names minus ID Column
   test_names <- names(test_subset[-1])
   
+  #Creates pivot longer table for plotting
   test_subset_long <- pivot_longer(test_subset, 
                                    cols = all_of(test_names), 
                                    names_to = "variable", 
@@ -213,6 +227,7 @@ long_subset_maker <- function(test_var,df){
   
   # Create a new column indicating whether it's Pre or Post
   test_subset_long$Type <- ifelse(grepl("Prer", test_subset_long$variable), "Pre", "Post")
+  # Creates Location column what indicates the Location
   test_subset_long$Location <- ifelse(grepl("Albany", test_subset_long$variable),"Albany",
                                       ifelse(grepl("Conyers", test_subset_long$variable), "Conyers",
                                              ifelse(grepl("Peachtree_Tower", test_subset_long$variable), "Peachtee_Tower",
