@@ -1,0 +1,43 @@
+General Process of the Analysis:
+1. .csv files are fulled from Attune. Making sure to use rounded timestamps
+  -Files vizually inspected to ensure all the neccessary data is pulled
+  -Completely blank columns (i.e. sensor wasnt connected) are removed
+  -Check to see if resident likely smoked in the room (i.e. High Co2, Pm2.5, etc.)
+    -If so noted and removed
+  -Files should be organized by Pre and Post Renovation
+  -Names of file should be standardized by location and status (i.e. Post_Albany, Prer_East_Lake, etc.)
+    -Prer is used because one set of the code removes the first 5 characters which was easier than finding another way
+    
+2. Kresge_auto_agg_to_excel.R
+- Using Non_Smoking Folder
+  A) sum_up(combine_variables(data)) 
+      -gives 5 num sum of all locations in the folder
+      -Combines Sensors
+      -Used the created Pre and Post excel sheets to create Kresge_tables_v3.xlsx
+  B) do_both(combine_variables(data))
+      -Uses 3 functions
+        - combine_variables() combines like variables across a locations 
+          (i.e. The Co2 data from each sensor is averaged for each time point and
+          in a single column)
+        - do_both()
+          - convert_data(): tries a few ways to convert the data so it can be used
+            for the hour aggregation
+          - by_hour_agg(): aggregates the data by hour and standardized the names
+
+3. Plot_everything.R
+  - Takes in the output file from do_both() (.xlsx file with multiplesheets)
+  - File is sent through multiplesheets() and turned into a list of dataframes
+  - That list is sent through combine_similar_columns() where a master dataframe
+    - This also subsets the data to the first 336 point (14 days) starting at noon for each location
+    - All location are combined into one dataframe on the first noon datapoint (ID = 1)
+  - That is done for both Pre and Post Reno output files
+  - Then theses dataframes are merged into one
+  - Long subsets are created using long_subset_maker()
+    - Creates the long subset
+    - Adds column for Pre or Post
+    - Adds column for Location
+    - Cleans varable name
+  - GGplot format is created and turned into function
+  - Each variable long subset is sent through the plot function
+  
+  
