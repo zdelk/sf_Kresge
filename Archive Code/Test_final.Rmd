@@ -1,0 +1,108 @@
+---
+title: "Kresge Final"
+output: word_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+sys.source("Non_writing_functions.R", envir = knitr::knit_global())
+```
+
+**Steps for the Analysis:**
+
+1.  Pull Full Datasets from Attune
+    -   Pre and Post are saved in different folders
+2.  Run Folder("Full Data") through Kresge_auto_agg_to_excel.R
+    -   Argument can be changed at "summary_data \<- XXX"
+    -   sum_up gives the 5numsum of all files
+    -   do_both(combine_variables(data)) does and hour average for all
+        files
+    -   Update input folder name and output folder name as needed
+3.  Do_Both creates a .xlsx file where each location gets its own sheet
+    1.  sum_up does this as well
+4.  For use, run the do_both file through the mulitplesheets() function
+    1.  This will load the individual sheets to R
+
+```{r load_in, echo=FALSE, include=FALSE}
+
+path_post <- "~/Kresge/Data/PostReno/Post_do_both_5_31.xlsx"
+my_sheets = multiplesheets(path_post)
+similar_columns_post <- c("Temp", "Hum", "Dioxide", "Organic", "PM2.5", "PM10", "HCHO", "Monoxide")
+post_reno <- combine_similar_columns(my_sheets, similar_columns_post)
+
+
+path_pre <- "~/Kresge/Data/PreReno/Prer_do_both_5_31.xlsx"
+my_sheets = multiplesheets(path_pre)
+similar_columns_pre <- c("Temp", "Hum", "CO2", "PM2.5", "PM10")
+pre_reno <- combine_similar_columns(my_sheets, similar_columns_pre)
+
+
+merged_df <- merge(post_reno, pre_reno, by = "ID")
+
+```
+
+```{r subsetting, echo=FALSE, include=FALSE}
+library(tidyr)
+long_subset_maker <- function(test_var,df){
+
+  test_subset <- subset(merged_df, select = c("ID", grep(test_var, names(df), value = TRUE)))
+
+  test_subset <- colClean(test_subset)
+
+  test_names <- names(test_subset[-1])
+
+  test_subset_long <- pivot_longer(test_subset, 
+                                 cols = all_of(test_names), 
+                                 names_to = "variable", 
+                                 values_to = "Test_var")
+
+  # Create a new column indicating whether it's Pre or Post
+  test_subset_long$Type <- ifelse(grepl("Prer", test_subset_long$variable), "Pre", "Post")
+  test_subset_long$Location <- ifelse(grepl("Albany", test_subset_long$variable),"Albany",
+                                    ifelse(grepl("Conyers", test_subset_long$variable), "Conyers",
+                                           ifelse(grepl("Peachtree_Tower", test_subset_long$variable), "Peachtee_Tower",
+                                                  ifelse(grepl("Milledgeville", test_subset_long$variable), "Milledgeville",
+                                                         ifelse(grepl("East_Lake", test_subset_long$variable), "East_Lake",
+                                                                ifelse(grepl("Lucy_Morgan",
+                                                                             test_subset_long$variable),"Lucy_Morgan","Griffin"))))))
+  return(test_subset_long)
+}
+```
+
+```{r comparison_subsets, echo = FALSE, include=FALSE}
+temp_long_subset <- long_subset_maker("Temp",merged_df)
+hum_long_subset <- long_subset_maker("Hum", merged_df)
+co2_long_subset <- long_subset_maker("CO2|Dioxide", merged_df)
+pm2.5_long_subset <- long_subset_maker("PM2.5", merged_df)
+pm10_long_subset <- long_subset_maker("PM10", merged_df)
+
+```
+
+```{r plot_functions, echo= FALSE, include=FALSE}
+library(ggplot2)
+my_colors <- c("red", "blue", "green", "#FF7F00", "purple", "yellow","#F781BF")
+
+# Set linetype based on the Type column
+comp_plot <- function(long_ss, threshold, title){
+  ggplot(long_ss, aes(x = ID, y = Test_var, color = Location, linetype = Type)) +
+  geom_line(size = 1) +
+  ggtitle(title)+
+  geom_hline(yintercept = threshold, linetype = "dashed", color = "red") +
+  labs(color = "Location") +
+  scale_color_manual(values = my_colors) +
+  scale_linetype_manual(values = c("dashed", "solid"))
+  }
+```
+
+```{r comparison_plots, fig.align='center', warning=FALSE}
+comp_plot(temp_long_subset, 74, "Temperture Comparison")
+comp_plot(hum_long_subset, 70, "Humidity Comparison")
+comp_plot(co2_long_subset, 2001, "Co2 Comparison")
+comp_plot(pm2.5_long_subset, 55.5, "Pm2.5 Comparison")
+comp_plot(pm10_long_subset, 255, "Pm10 Comparison")
+comp_plot(pm10_long_subset, 255, "Pm10 Comparison")
+```
+
